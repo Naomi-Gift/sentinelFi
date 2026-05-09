@@ -2,7 +2,7 @@ export type RiskLabel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export type WalletSignals = {
   address: string;
-  rpcEndpoint: "helius-mainnet" | "solana-mainnet";
+  rpcEndpoint: "helius-devnet" | "helius-mainnet" | "solana-devnet" | "solana-mainnet";
   transactionCount: number;
   walletAgeDays: number | null;
   firstTransactionAt: string | null;

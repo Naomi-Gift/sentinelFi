@@ -19,7 +19,17 @@ export async function POST(request: Request) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ address, storeOnChain: false })
   });
-  const verdict = (await response.json()) as AnalyzeResponse;
+  const text = await response.text();
+  let verdict: AnalyzeResponse;
+
+  try {
+    verdict = JSON.parse(text) as AnalyzeResponse;
+  } catch {
+    return NextResponse.json(
+      { error: "Analyze endpoint returned a non-JSON response.", detail: text.slice(0, 180) },
+      { status: 502 }
+    );
+  }
 
   if (!response.ok) {
     return NextResponse.json(verdict, { status: response.status });

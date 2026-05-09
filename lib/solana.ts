@@ -22,7 +22,12 @@ function rpcUrl() {
 }
 
 function endpointLabel(): WalletSignals["rpcEndpoint"] {
-  return process.env.HELIUS_API_KEY ? "helius-mainnet" : "solana-mainnet";
+  const network = process.env.NEXT_PUBLIC_SOLANA_NETWORK === "mainnet" ? "mainnet" : "devnet";
+  if (process.env.HELIUS_RPC_URL || process.env.HELIUS_API_KEY) {
+    return network === "mainnet" ? "helius-mainnet" : "helius-devnet";
+  }
+
+  return network === "mainnet" ? "solana-mainnet" : "solana-devnet";
 }
 
 function dateFromBlockTime(blockTime?: number | null) {
