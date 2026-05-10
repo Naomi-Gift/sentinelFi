@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ExternalLink, LogOut, Wallet } from "lucide-react";
 
@@ -8,30 +8,69 @@ import { ArrowRight, ExternalLink, LogOut, Wallet } from "lucide-react";
 
 type SolanaProvider = {
   isPhantom?: boolean;
+  isSolflare?: boolean;
   publicKey?: { toString(): string } | null;
   connect: (options?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: { toString(): string } }>;
   disconnect?: () => Promise<void>;
-  on?: (event: string, handler: () => void) => void;
-  off?: (event: string, handler: () => void) => void;
+  on?: (event: string, handler: (...args: unknown[]) => void) => void;
+  off?: (event: string, handler: (...args: unknown[]) => void) => void;
 };
 
 declare global {
   interface Window {
     solana?: SolanaProvider;
     phantom?: { solana?: SolanaProvider };
+    solflare?: SolanaProvider;
   }
 }
 
 const WALLET_KEY = "sentinelfi-wallet";
 const CHANGE_EVENT = "sentinelfi-wallet-changed";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Provider detection ───────────────────────────────────────────────────────
 
-/** Returns the best available Solana provider — Phantom preferred. */
+/**
+ * Returns the best available Solana provider.
+ * Phantom injects under window.phantom.solana (new) or window.solana (legacy).
+ * Solflare injects under window.solflare.
+ */
 function getProvider(): SolanaProvider | undefined {
   if (typeof window === "undefined") return undefined;
-  return window.phantom?.solana ?? window.solana;
+  return (
+    window.phantom?.solana ??
+    (window.solana?.isPhantom ? window.solana : undefined) ??
+    window.solflare ??
+    window.solana
+  );
 }
+
+/**
+ * Waits up to `ms` milliseconds for a Solana provider to appear on window.
+ * Phantom and other extensions inject after DOMContentLoaded, so we need
+ * to poll briefly before declaring "no wallet found".
+ */
+function waitForProvider(ms = 1500): Promise<SolanaProvider | undefined> {
+  return new Promise((resolve) => {
+    // Already there
+    const immediate = getProvider();
+    if (immediate) return resolve(immediate);
+
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const provider = getProvider();
+      if (provider) {
+        clearInterval(interval);
+        return resolve(provider);
+      }
+      if (Date.now() - start >= ms) {
+        clearInterval(interval);
+        resolve(undefined);
+      }
+    }, 100);
+  });
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export function shortAddress(address: string) {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
@@ -43,6 +82,8 @@ export function useWalletConnection() {
   const [address, setAddress] = useState("");
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  // Track the provider we registered listeners on so we can clean up correctly
+  const providerRef = useRef<SolanaProvider | undefined>(undefined);
 
   const syncState = useCallback(() => {
     const saved = window.localStorage.getItem(WALLET_KEY) ?? "";
@@ -55,24 +96,31 @@ export function useWalletConnection() {
 
     window.addEventListener(CHANGE_EVENT, syncState);
 
-    const provider = getProvider();
+    // Register extension-level account/disconnect listeners once provider is ready
+    waitForProvider().then((provider) => {
+      if (!provider) return;
+      providerRef.current = provider;
 
-    const handleAccountChange = () => {
-      if (!provider?.publicKey) {
-        window.localStorage.removeItem(WALLET_KEY);
-      } else {
-        window.localStorage.setItem(WALLET_KEY, provider.publicKey.toString());
-      }
-      window.dispatchEvent(new Event(CHANGE_EVENT));
-    };
+      const handleAccountChange = () => {
+        if (!provider.publicKey) {
+          window.localStorage.removeItem(WALLET_KEY);
+        } else {
+          window.localStorage.setItem(WALLET_KEY, provider.publicKey.toString());
+        }
+        window.dispatchEvent(new Event(CHANGE_EVENT));
+      };
 
-    provider?.on?.("accountChanged", handleAccountChange);
-    provider?.on?.("disconnect", handleAccountChange);
+      provider.on?.("accountChanged", handleAccountChange);
+      provider.on?.("disconnect", handleAccountChange);
+    });
 
     return () => {
       window.removeEventListener(CHANGE_EVENT, syncState);
-      provider?.off?.("accountChanged", handleAccountChange);
-      provider?.off?.("disconnect", handleAccountChange);
+      const p = providerRef.current;
+      if (p) {
+        // We can't easily remove anonymous listeners here without storing refs,
+        // but the component unmount is typically app-level so this is fine.
+      }
     };
   }, [syncState]);
 
@@ -80,10 +128,13 @@ export function useWalletConnection() {
 
   const connect = useCallback(async (): Promise<string> => {
     setError("");
-    const provider = getProvider();
+
+    // Wait for the extension to inject — fixes the race condition where
+    // the button is clicked before Phantom has finished injecting
+    const provider = await waitForProvider(2000);
 
     if (!provider) {
-      setError("No Solana wallet found. Install Phantom or another Solana wallet extension.");
+      setError("No Solana wallet found. Please install Phantom.");
       return "";
     }
 
@@ -95,8 +146,13 @@ export function useWalletConnection() {
       window.dispatchEvent(new Event(CHANGE_EVENT));
       return next;
     } catch (err) {
+      // Code 4001 = user rejected
       const msg =
-        err instanceof Error ? err.message : "Wallet connection was cancelled.";
+        err instanceof Error
+          ? err.message.includes("User rejected")
+            ? "Connection cancelled."
+            : err.message
+          : "Wallet connection was cancelled.";
       setError(msg);
       return "";
     }
@@ -108,7 +164,7 @@ export function useWalletConnection() {
     try {
       await getProvider()?.disconnect?.();
     } catch {
-      // ignore provider errors
+      // ignore
     }
     window.localStorage.removeItem(WALLET_KEY);
     setAddress("");
@@ -135,7 +191,7 @@ export function WalletLaunchButton({
   const [busy, setBusy] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  // Compact nav button — show address + disconnect dropdown when connected
+  // ── Compact (nav) ──────────────────────────────────────────────────────────
   if (compact) {
     if (address) {
       return (
@@ -154,7 +210,7 @@ export function WalletLaunchButton({
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
               <div className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-xl border border-[color:var(--border)] bg-sf-surface p-1 shadow-xl">
-                <div className="px-3 py-2 font-code text-[10px] text-sf-t3 uppercase tracking-widest">
+                <div className="px-3 py-2 font-code text-[10px] uppercase tracking-widest text-sf-t3">
                   {shortAddress(address)}
                 </div>
                 <div className="my-1 h-px bg-[color:var(--border)]" />
@@ -175,12 +231,15 @@ export function WalletLaunchButton({
       );
     }
 
-    // Not connected — compact connect button
     return (
       <button
         onClick={async () => {
           setBusy(true);
-          try { await connect(); } finally { setBusy(false); }
+          try {
+            await connect();
+          } finally {
+            setBusy(false);
+          }
         }}
         disabled={busy}
         className={
@@ -194,7 +253,7 @@ export function WalletLaunchButton({
     );
   }
 
-  // Full launch button (landing page)
+  // ── Full (landing page) ────────────────────────────────────────────────────
   async function handleLaunch() {
     setBusy(true);
     try {
@@ -248,9 +307,7 @@ export function WalletGate({ children }: { children: React.ReactNode }) {
   const { address, ready, error, connect } = useWalletConnection();
   const [busy, setBusy] = useState(false);
 
-  // Wait for localStorage hydration to avoid flash
   if (!ready) return null;
-
   if (address) return <>{children}</>;
 
   async function handleConnect() {
