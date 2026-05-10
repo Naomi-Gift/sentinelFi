@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Nav } from "@/components/nav";
 import { shortAddress, useWalletConnection, WalletGate } from "@/components/wallet-connect";
 
+
 const suggestions = ["Stake 2 SOL safely", "Best yield with risk check", "Exit risky positions"];
 const metrics = [
   ["Portfolio score", "74", "+3 today", "text-sf-ok"],
@@ -28,7 +29,7 @@ const trace = [
 ];
 
 export default function AppDashboard() {
-  const { address, isPreview } = useWalletConnection();
+  const { address } = useWalletConnection();
   const [command, setCommand] = useState("Stake 2 SOL only if security check passes.");
   const [running, setRunning] = useState(false);
   const [runStatus, setRunStatus] = useState<"idle" | "complete" | "error">("idle");
@@ -75,8 +76,7 @@ export default function AppDashboard() {
           </div>
           <div className="rounded-2xl border border-[color:var(--border)] bg-sf-surface/75 p-3">
             <div className="metric-label">Connected wallet</div>
-            <div className="font-code mt-2 text-sm text-sf-t1">{address ? shortAddress(address) : "Connected"}</div>
-            {isPreview && <div className="mt-1 text-xs text-sf-warn">Preview mode · wallet extension not detected</div>}
+            <div className="font-code mt-2 text-sm text-sf-t1">{shortAddress(address)}</div>
           </div>
         </motion.div>
 
@@ -87,9 +87,7 @@ export default function AppDashboard() {
                 <div className="metric-label">Primary action</div>
                 <h2 className="font-display mt-2 text-2xl font-bold text-sf-t1">Stake 2 SOL only if the route is safe.</h2>
                 <p className="mt-2 text-sm text-sf-t2">
-                  {isPreview
-                    ? "Preview mode shows the product loop without submitting wallet transactions."
-                    : "This is the full product loop: command, check, verdict, wallet approval."}
+                  This is the full product loop: command, check, verdict, wallet approval.
                 </p>
               </div>
               <div className="font-code inline-flex w-fit items-center gap-2 rounded-full border border-sf-ok/25 bg-sf-ok/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.08em] text-sf-ok">
@@ -152,11 +150,11 @@ export default function AppDashboard() {
                   Recommendation ready
                 </div>
                 <p className="mt-3 text-sm leading-6 text-sf-t1">
-                  Stake 2 SOL via Marinade at 7.4% APY. The route is LOW RISK, within policy, and ready for {isPreview ? "review" : "wallet approval"}.
+                  Stake 2 SOL via Marinade at 7.4% APY. The route is LOW RISK, within policy, and ready for wallet approval.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2 self-end">
-                <button className="rounded-full bg-sf-ok px-3 py-3 text-sm font-medium text-sf-void">{isPreview ? "Review" : "Approve"}</button>
+                <button className="rounded-full bg-sf-ok px-3 py-3 text-sm font-medium text-sf-void">Approve</button>
                 <button className="rounded-full border border-[color:var(--border)] px-3 py-3 text-sm text-sf-t2">Dismiss</button>
               </div>
             </div>
