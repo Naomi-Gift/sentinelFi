@@ -1,83 +1,186 @@
 # SentinelFi
 
-Autonomous DeFi execution for Solana, with security checks built into every action.
+**Autonomous DeFi execution for Solana — with security checks built into every action.**
 
-SentinelFi monitors a portfolio, reads user-defined policy on-chain, checks wallet and contract risk before execution, pays for risk intelligence through x402, and records the decision trail on Solana.
+SentinelFi is an AI-powered portfolio agent that monitors positions, enforces user-defined on-chain policy, and runs a paid risk check against every target before money moves. The result is a verifiable decision trail: score, verdict, x402 receipt, and on-chain PDA — attached to every action the agent takes.
 
-## Why It Matters
+---
 
-Autonomous agents can move funds faster than users can manually review counterparties, contracts, routes, and token risk. SentinelFi turns security into a required step in the execution loop instead of an optional dashboard afterthought.
+## How It Works
 
-Before the agent stakes, swaps, rebalances, or quarantines assets, it runs a fresh risk check against the target. The check produces a score, label, reasons, flags, x402 payment receipt, and on-chain verdict PDA. The agent then allows, blocks, or escalates the action according to policy.
-
-```text
-User intent
-  -> on-chain policy
-  -> x402-paid security check
-  -> risk verdict PDA
-  -> agent action or block
-  -> action ledger entry with verdict + receipt
 ```
+User intent
+  → on-chain policy check
+  → x402-paid security verdict
+  → risk score + label + flags
+  → agent action or block
+  → action ledger entry (verdict + receipt on-chain)
+```
+
+Before the agent stakes, swaps, rebalances, or quarantines assets it runs a fresh risk check against the target. The check returns a score (0–100), a label (LOW / MEDIUM / HIGH / CRITICAL), reasons, flags, an x402 payment receipt, and a verdict PDA stored on Solana. The agent then allows, blocks, or escalates according to the wallet's active policy.
+
+---
 
 ## Product Surface
 
-| Area | Purpose |
+| Route | Purpose |
 |---|---|
-| `/` | Product overview and execution loop |
+| `/` | Landing page and execution loop overview |
 | `/app` | Portfolio dashboard and agent command center |
 | `/app/chat` | Natural-language DeFi commands |
+| `/app/scan` | Manual wallet or contract security scan |
 | `/app/history` | On-chain-style action and security log |
 | `/app/policy` | User policy controls |
-| `/app/scan` | Manual wallet or contract security scan |
-| `/docs` | API, x402, and contract documentation |
+| `/docs` | API, x402, and contract reference |
+
+---
 
 ## On-Chain Programs
 
-All programs are written in Rust with Anchor and target Solana devnet.
+All programs are written in Rust with the [Anchor](https://www.anchor-lang.com/) framework and target Solana devnet.
 
-| Program | Program ID | Source | Purpose |
-|---|---|---|---|
-| Verdict Registry | `B5zhRju3oDVLXtX72Tpi8DDTWceDetQqC14eMEheqLQ9` | `programs/sentinelfi/verdict_registry/src/lib.rs` | Stores risk score, label, x402 proof, timestamp, and version per target PDA |
-| Agent Policy | `8hsKs8eBYwUqGmim6PcstpS75YFWpinGugrBv7gdvD1T` | `programs/sentinelfi/agent_policy/src/lib.rs` | Stores user automation limits, security-check toggle, and x402 spend cap |
-| Action Ledger | `AnGfz5kMTCqxnKtEciDc6QUqZvaHhqh1nyAjd8GcrMGH` | `programs/sentinelfi/action_ledger/src/lib.rs` | Logs agent actions with attached verdict PDA and x402 receipt |
-| Vault Router | `213i6h266zzchmxs5wKFcAfwkwAy9dgYQhGg8EZTE66r` | `programs/sentinelfi/vault_router/src/lib.rs` | Tracks active DeFi allocations by owner, protocol, amount, and APY |
+| Program | Source | Purpose |
+|---|---|---|
+| **Verdict Registry** | `programs/sentinelfi/verdict_registry/` | Stores risk score, label, x402 proof, timestamp, and version per target PDA |
+| **Agent Policy** | `programs/sentinelfi/agent_policy/` | Stores user automation limits, security-check toggle, and x402 spend cap |
+| **Action Ledger** | `programs/sentinelfi/action_ledger/` | Logs agent actions with attached verdict PDA and x402 receipt |
+| **Vault Router** | `programs/sentinelfi/vault_router/` | Tracks active DeFi allocations by owner, protocol, amount, and APY |
 
-Explorer links:
+Program IDs are set via environment variables (see [Environment Variables](#environment-variables)) so they can be updated after each deploy without touching source code.
 
-```text
-https://explorer.solana.com/address/B5zhRju3oDVLXtX72Tpi8DDTWceDetQqC14eMEheqLQ9?cluster=devnet
-https://explorer.solana.com/address/8hsKs8eBYwUqGmim6PcstpS75YFWpinGugrBv7gdvD1T?cluster=devnet
-https://explorer.solana.com/address/AnGfz5kMTCqxnKtEciDc6QUqZvaHhqh1nyAjd8GcrMGH?cluster=devnet
-https://explorer.solana.com/address/213i6h266zzchmxs5wKFcAfwkwAy9dgYQhGg8EZTE66r?cluster=devnet
+---
+
+## x402 Payment Flow
+
+SentinelFi models paid machine-to-machine intelligence. The agent requests a security verdict, receives an HTTP 402 response, pays the required USDC amount autonomously, retries with payment proof, and records the receipt alongside the action.
+
 ```
-
-## x402 Flow
-
-SentinelFi models paid machine-to-machine intelligence. The agent requests a security verdict, receives an HTTP 402 payment requirement, pays the required USDC amount, retries with payment proof, and records the receipt alongside the action.
-
-```text
 GET /api/analyze
-<- 402 Payment Required
--> x402 payment proof
-<- verdict JSON
--> store verdict PDA
--> log action + verdict + receipt
+← 402 Payment Required
+→ x402 payment proof header
+← verdict JSON
+→ store verdict PDA on-chain
+→ log action + verdict + receipt
 ```
 
-Local development uses deterministic local receipts when live Coinbase CDP verification is not configured. The payment boundary is isolated in `lib/x402.ts` so live verification can be enabled without changing the agent flow.
+Local development uses deterministic local receipts when live Coinbase CDP verification is not configured. The payment boundary is isolated in `lib/x402.ts` — enabling live verification requires only a CDP key, no changes to the agent flow.
 
-## API
+---
+
+## API Reference
 
 | Method | Route | Description |
 |---|---|---|
-| `POST` | `/api/agent` | Runs the agent and triggers security checks before recommended actions |
-| `POST` | `/api/analyze` | Runs a wallet or contract security check |
-| `POST` | `/api/watch` | Watches a wallet for risk changes |
-| `POST` | `/api/x402/pay` | Creates an autonomous x402 payment receipt |
+| `POST` | `/api/agent` | Run the agent — triggers policy check, security verdict, and recommendation |
+| `POST` | `/api/analyze` | Run a wallet or contract security check |
+| `POST` | `/api/watch` | Watch a wallet for risk changes |
+| `POST` | `/api/x402/pay` | Create an autonomous x402 payment receipt |
+
+### `POST /api/analyze`
+
+**Request**
+```json
+{ "address": "<solana-wallet-or-contract>" }
+```
+
+**Response**
+```json
+{
+  "address": "...",
+  "score": 12,
+  "label": "LOW",
+  "verdict": "Active, well-known protocol with consistent usage.",
+  "reasons": ["..."],
+  "flags": [],
+  "onChainPDA": "...",
+  "analyzedAt": "2025-01-01T00:00:00.000Z"
+}
+```
+
+### `POST /api/agent`
+
+**Request**
+```json
+{ "userMessage": "Stake 2 SOL only if the route is safe" }
+```
+
+**Response**
+```json
+{ "briefing": "Stake 2 SOL via Marinade at 7.4% APY. Route is LOW RISK, within policy." }
+```
+
+---
+
+## SDK
+
+A lightweight client SDK is published from the `sdk/` directory.
+
+```bash
+npm install sentinelfi-sdk
+```
+
+```ts
+import { analyze, watch } from "sentinelfi-sdk";
+
+// Run a security check
+const verdict = await analyze("TARGET_ADDRESS");
+console.log(verdict.score, verdict.label);
+
+// Watch a wallet for risk changes
+await watch("WALLET_ADDRESS", (update) => {
+  console.log(update.label);
+});
+```
+
+---
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+
+- Rust + `cargo-build-sbf` (for contract development)
+- Solana CLI (for deployment)
+
+### App Setup
+
+```bash
+npm install
+cp .env.example .env.local
+# fill in .env.local (see Environment Variables below)
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Environment Variables
+
+```env
+# Solana RPC
+HELIUS_RPC_URL=
+
+# AI
+ANTHROPIC_API_KEY=
+
+# x402 payments (leave blank to use local dev receipts)
+COINBASE_CDP_API_KEY=
+
+# On-chain program IDs (set after deploy)
+NEXT_PUBLIC_VERDICT_REGISTRY_ID=
+NEXT_PUBLIC_AGENT_POLICY_ID=
+NEXT_PUBLIC_ACTION_LEDGER_ID=
+NEXT_PUBLIC_VAULT_ROUTER_ID=
+
+# Anchor audit signer (local keypair path or JSON)
+ANCHOR_AUDIT_PROGRAM_ID=
+ANCHOR_AUDIT_KEYPAIR_JSON=
+```
+
+---
 
 ## Contract Development
 
-Build all programs:
+### Build
 
 ```bash
 cargo build-sbf --manifest-path programs/sentinelfi/verdict_registry/Cargo.toml --sbf-out-dir target/deploy
@@ -86,7 +189,7 @@ cargo build-sbf --manifest-path programs/sentinelfi/action_ledger/Cargo.toml --s
 cargo build-sbf --manifest-path programs/sentinelfi/vault_router/Cargo.toml --sbf-out-dir target/deploy
 ```
 
-Deploy:
+### Deploy to Devnet
 
 ```bash
 solana config set --url devnet
@@ -96,7 +199,9 @@ solana program deploy target/deploy/action_ledger.so --program-id target/deploy/
 solana program deploy target/deploy/vault_router.so --program-id target/deploy/vault_router-keypair.json
 ```
 
-Verify:
+After deploying, copy the program IDs into `.env.local`.
+
+### Verify
 
 ```bash
 cargo test --workspace
@@ -105,38 +210,26 @@ npm run lint
 npm run build
 ```
 
-## Local App Setup
+---
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
+## Project Structure
+
+```
+app/                    Next.js pages and API routes
+  api/                  Agent, analyze, watch, x402 endpoints
+  app/                  Authenticated app shell (dashboard, chat, scan, history, policy)
+components/             Shared UI components (nav, wallet, logo, results)
+lib/                    Core logic — agent, Solana, x402, risk scoring, audit trail
+programs/sentinelfi/    Rust Anchor programs
+  verdict_registry/     Risk verdict storage
+  agent_policy/         User policy enforcement
+  action_ledger/        Action + receipt logging
+  vault_router/         DeFi allocation tracking
+sdk/                    Client SDK (analyze, watch, bulk)
+tests/                  Integration tests
 ```
 
-Important environment variables:
-
-```env
-HELIUS_RPC_URL=
-ANTHROPIC_API_KEY=
-COINBASE_CDP_API_KEY=
-NEXT_PUBLIC_VERDICT_REGISTRY_ID=
-NEXT_PUBLIC_AGENT_POLICY_ID=
-NEXT_PUBLIC_ACTION_LEDGER_ID=
-NEXT_PUBLIC_VAULT_ROUTER_ID=
-ANCHOR_AUDIT_PROGRAM_ID=
-ANCHOR_AUDIT_KEYPAIR_JSON=
-```
-
-## Architecture
-
-```text
-app/                         Next.js application and API routes
-components/                  Shared UI
-lib/                         Agent, Solana, x402, risk, and audit logic
-programs/sentinelfi/         Rust Anchor programs
-sdk/                         Client SDK surface
-target/deploy/               Built SBF artifacts and program keypairs
-```
+---
 
 ## License
 
