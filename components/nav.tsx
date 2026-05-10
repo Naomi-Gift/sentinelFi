@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { WalletLaunchButton } from "@/components/wallet-connect";
+import { SentinelLogo } from "@/components/logo";
 
 export function Nav() {
   return (
     <header className="sticky top-0 z-30 border-b border-[color:var(--border)] bg-sf-void/82 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-8">
-      <Link href="/" className="font-display flex items-center gap-3 text-lg font-extrabold text-sf-t1">
-        <span className="grid h-8 w-8 place-items-center rounded-lg border border-sf-primary/30 bg-sf-primary/10 text-sm text-sf-primary">
-          S
-        </span>
+      <Link href="/" className="font-display flex items-center gap-2.5 text-lg font-extrabold text-sf-t1">
+        <SentinelLogo size={32} />
         <span>SentinelFi</span>
       </Link>
 

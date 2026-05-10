@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="100" y1="20" x2="100" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00B4FF"/>
+      <stop offset="100%" stop-color="#00E5CC"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="100" y1="20" x2="100" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00B4FF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#00E5CC" stop-opacity="0.06"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shield background fill -->
+  <path
+    d="M100 18 L168 46 L168 102 C168 140 138 168 100 182 C62 168 32 140 32 102 L32 46 Z"
+    fill="url(#glowGrad)"
+    stroke="url(#shieldGrad)"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+
+  <!-- Shield outline glow layer -->
+  <path
+    d="M100 18 L168 46 L168 102 C168 140 138 168 100 182 C62 168 32 140 32 102 L32 46 Z"
+    fill="none"
+    stroke="url(#shieldGrad)"
+    stroke-width="1"
+    stroke-linejoin="round"
+    opacity="0.35"
+    filter="url(#glow)"
+  />
+
+  <!-- Inner shield ring -->
+  <path
+    d="M100 32 L156 56 L156 102 C156 133 130 157 100 169 C70 157 44 133 44 102 L44 56 Z"
+    fill="none"
+    stroke="url(#shieldGrad)"
+    stroke-width="1"
+    stroke-linejoin="round"
+    opacity="0.2"
+  />
+
+  <!-- S letterform — bold, centered -->
+  <text
+    x="100"
+    y="122"
+    text-anchor="middle"
+    font-family="'Syne', 'Arial Black', sans-serif"
+    font-weight="800"
+    font-size="76"
+    fill="url(#shieldGrad)"
+    filter="url(#glow)"
+  >S</text>
+
+  <!-- Scan line accent — bottom of shield -->
+  <line x1="68" y1="152" x2="132" y2="152" stroke="url(#shieldGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="82" y1="160" x2="118" y2="160" stroke="url(#shieldGrad)" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
+</svg>
