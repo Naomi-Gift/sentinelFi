@@ -9,44 +9,42 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        sf: {
+          void: "#020407",
+          deep: "#050C17",
+          surface: "#080F1E",
+          raised: "#0A1628",
+          primary: "#00B4FF",
+          security: "#00E5CC",
+          secondary: "#00E5CC",
+          x402: "#A855F7",
+          ok: "#00E676",
+          warn: "#FFD600",
+          danger: "#FF4A4A",
+          critical: "#FF1744",
+          t1: "#EBF4FF",
+          t2: "#6B9AB8",
+          t3: "#2A4158"
+        },
         guard: {
-          bg: "#080B10",
-          surface: "#0D1117",
-          border: "#1C2333",
-          cyan: "#00E5FF",
-          text: "#C9D1D9",
-          muted: "#6E7681",
-          low: "#00FF87",
-          medium: "#FFB300",
-          high: "#FF6B35",
-          critical: "#FF2D55"
+          bg: "#020407",
+          surface: "#080F1E",
+          border: "rgba(0, 180, 255, 0.08)",
+          cyan: "#00E5CC",
+          text: "#EBF4FF",
+          muted: "#6B9AB8",
+          low: "#00E676",
+          medium: "#FFD600",
+          high: "#FF4A4A",
+          critical: "#FF1744"
         }
       },
       fontFamily: {
-        mono: ["JetBrains Mono", "monospace"],
-        sans: ["DM Sans", "system-ui", "sans-serif"]
+        display: ["Syne", "sans-serif"],
+        mono: ["IBM Plex Mono", "monospace"],
+        sans: ["Outfit", "sans-serif"]
       },
-      boxShadow: {
-        cyan: "0 0 30px rgba(0, 229, 255, 0.22)",
-        critical: "0 0 38px rgba(255, 45, 85, 0.28)"
-      },
-      keyframes: {
-        scanline: {
-          "0%": { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(100vh)" }
-        },
-        gaugeDraw: {
-          "0%": { strokeDashoffset: "314" }
-        },
-        pulseGlow: {
-          "0%, 100%": { opacity: "0.55" },
-          "50%": { opacity: "1" }
-        }
-      },
-      animation: {
-        scanline: "scanline 7s linear infinite",
-        pulseGlow: "pulseGlow 1.8s ease-in-out infinite"
-      }
+      boxShadow: {}
     }
   },
   plugins: []

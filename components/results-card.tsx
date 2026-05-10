@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { ChevronDown, Copy, ExternalLink, Terminal, CheckCircle2 } from "lucide-react";
+import { Bot, ChevronDown, Copy, ExternalLink, Terminal, CheckCircle2, Zap } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import type { AnalyzeResponse, RiskLabel } from "@/lib/types";
@@ -146,7 +146,26 @@ export function ResultsCard({ result }: { result: AnalyzeResponse }) {
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 0.7 }}
+        className="border-t border-[#A855F7]/35 bg-[#A855F7]/10 p-5"
+      >
+        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+          <div className="flex items-center gap-3 text-[#D8B4FE]">
+            <Zap className="h-5 w-5" />
+            <span className="font-mono text-sm uppercase tracking-[0.16em]">
+              x402-ready paid intelligence
+            </span>
+          </div>
+          <div className="font-mono text-xs text-guard-text">
+            0.001 USDC per check · consumed automatically by Sentinel Agent
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.85 }}
         className="border-t border-guard-border bg-guard-low/8 p-5"
       >
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
@@ -198,6 +217,13 @@ export function ResultsCard({ result }: { result: AnalyzeResponse }) {
                   <code>{json}</code>
                 </pre>
               </div>
+              <a
+                href="/app"
+                className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-guard-cyan/50 px-4 font-mono text-xs uppercase tracking-[0.14em] text-guard-cyan transition hover:bg-guard-cyan hover:text-[#031014]"
+              >
+                <Bot className="h-4 w-4" />
+                Use inside Sentinel Agent
+              </a>
             </motion.div>
           )}
         </AnimatePresence>

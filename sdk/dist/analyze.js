@@ -9,7 +9,7 @@ async function analyzeWallet(address, options) {
         body: JSON.stringify({ address, storeOnChain: options?.storeOnChain ?? true })
     });
     if (!response.ok) {
-        throw new Error(`WalletGuard analysis failed: ${response.statusText}`);
+        throw new Error(`Sentinel Guard analysis failed: ${response.statusText}`);
     }
     const payload = await response.json();
     return {

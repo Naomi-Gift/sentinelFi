@@ -1,21 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: dark;
-  background: #080b10;
-  --bg-base: #080b10;
-  --bg-surface: #0d1117;
-  --border: #1c2333;
-  --accent: #00e5ff;
-  --accent-glow: rgba(0, 229, 255, 0.15);
-  --text-primary: #c9d1d9;
-  --text-muted: #6e7681;
-  --risk-low: #00ff87;
-  --risk-medium: #ffb300;
-  --risk-high: #ff6b35;
-  --risk-critical: #ff2d55;
+  --void: #020407;
+  --deep: #050c17;
+  --surface: #080f1e;
+  --raised: #0a1628;
+  --border: rgba(0, 180, 255, 0.08);
+  --border-hot: rgba(0, 180, 255, 0.25);
+  --primary: #00b4ff;
+  --security: #00e5cc;
+  --secondary: #00e5cc;
+  --x402: #a855f7;
+  --ok: #00e676;
+  --warn: #ffd600;
+  --danger: #ff4a4a;
+  --critical: #ff1744;
+  --t1: #ebf4ff;
+  --t2: #6b9ab8;
+  --t3: #2a4158;
+  background: var(--void);
 }
 
 * {
@@ -29,49 +37,48 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(0, 229, 255, 0.12), transparent 30rem),
-    radial-gradient(circle at 82% 12%, rgba(255, 45, 85, 0.08), transparent 25rem),
-    #080b10;
-  color: #c9d1d9;
-  font-family: "DM Sans", system-ui, sans-serif;
+  background: var(--void);
+  color: var(--t1);
+  font-family: "Outfit", sans-serif;
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
 ::selection {
-  background: rgba(0, 229, 255, 0.28);
+  background: rgba(0, 229, 204, 0.25);
 }
 
-.scan-grid {
-  background-image:
-    linear-gradient(rgba(0, 229, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 229, 255, 0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
+.font-display {
+  font-family: "Syne", sans-serif;
 }
 
-.scanline::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(0, 229, 255, 0.1),
-    rgba(0, 229, 255, 0.02),
-    transparent
-  );
-  height: 140px;
-  animation: scanline 6.5s linear infinite;
-  z-index: 1;
+.font-code {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.card {
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.card-raised {
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--raised);
+}
+
+.focus-guard:focus {
+  border-color: var(--border-hot);
+  box-shadow: 0 0 0 2px rgba(0, 229, 204, 0.3);
 }
 
 .terminal-scrollbar {
-  scrollbar-color: #1c2333 #080b10;
+  scrollbar-color: var(--t3) var(--void);
 }
 
 .terminal-scrollbar::-webkit-scrollbar {
@@ -80,10 +87,10 @@ input {
 }
 
 .terminal-scrollbar::-webkit-scrollbar-track {
-  background: #080b10;
+  background: var(--void);
 }
 
 .terminal-scrollbar::-webkit-scrollbar-thumb {
-  background: #1c2333;
+  background: var(--t3);
   border-radius: 999px;
 }

@@ -23,6 +23,12 @@ export function localRiskVerdict(signals: WalletSignals): WalletVerdict {
   const reasons: string[] = [];
   const flags: string[] = [];
 
+  if (signals.directlyFlagged) {
+    score += 72;
+    flags.push("known-threat");
+    reasons.push("The wallet address appears directly in the local threat intelligence list.");
+  }
+
   if (signals.flaggedInteractions.length > 0) {
     score += 55;
     flags.push("scam-interaction");

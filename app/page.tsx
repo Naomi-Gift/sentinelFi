@@ -1,116 +1,215 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Activity, DatabaseZap, ExternalLink, Radar, Search, Sparkles } from "lucide-react";
-import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
-import { LoadingOverlay } from "@/components/loading-overlay";
+import { motion } from "framer-motion";
+import { ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import Link from "next/link";
 import { Nav } from "@/components/nav";
 
-const demoWallets = [
-  {
-    label: "Known Scammer",
-    address: "Htp9MGP8Tig923ZFY7Qf2zzbMUmYneFRPU1S9oVrPJpi"
-  },
-  {
-    label: "Dead Wallet",
-    address: "3a7zZQjEfgbLz4P7mGLZxgT4WZ2CK8Djq7QULGrn8J2V"
-  },
-  {
-    label: "Clean",
-    address: "11111111111111111111111111111111"
-  }
-];
-
 const stats = [
-  { icon: DatabaseZap, label: "On-chain Registry" },
-  { icon: Activity, label: "Real-time Data" },
-  { icon: Sparkles, label: "AI Verdicts" }
+  ["4", "Anchor programs"],
+  ["0.001", "USDC per check"],
+  ["x402", "Payment protocol"]
 ];
 
-export default function Home() {
-  const router = useRouter();
-  const [address, setAddress] = useState("");
-  const [loadingAddress, setLoadingAddress] = useState("");
-
-  function run(addressToAnalyze: string) {
-    const trimmed = addressToAnalyze.trim();
-    if (!trimmed) return;
-    setLoadingAddress(trimmed);
-    router.push(`/analyze/${encodeURIComponent(trimmed)}`);
+const traceRows = [
+  {
+    n: "01",
+    color: "var(--primary)",
+    title: "User intent received",
+    body: "Stake 2 SOL via Marinade safely",
+    meta: "Sentinel Agent · policy loaded"
+  },
+  {
+    n: "02",
+    color: "var(--x402)",
+    title: "x402 payment sent",
+    body: "0.001 USDC → risk intelligence API",
+    meta: "HTTP 402 → paid → retry"
+  },
+  {
+    n: "03",
+    color: "var(--security)",
+    title: "Risk verdict returned",
+    body: "Marinade · LOW RISK · score 12/100",
+    meta: "PDA: 8xKp...3mNw · stored on-chain"
+  },
+  {
+    n: "04",
+    color: "var(--ok)",
+    title: "Action logged",
+    body: "Stake approved · x402 receipt attached",
+    meta: "Action Ledger PDA · devnet"
   }
+];
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    run(address);
-  }
+const loop = [
+  ["01", "Command", "User asks SentinelFi to act — stake, swap, rebalance, or protect.", "var(--primary)"],
+  ["02", "Security check", "Agent pays 0.001 USDC via x402 for a fresh risk verdict on the target.", "var(--x402)"],
+  ["03", "Verdict", "AI scores the target. Result stored as a PDA on Solana devnet.", "var(--security)"],
+  ["04", "Action", "Agent acts within policy. Decision + verdict + receipt logged on-chain.", "var(--ok)"]
+];
 
+const contracts = [
+  ["Verdict Registry", "src/lib.rs", "Stores risk score, label, timestamp, PDA per wallet"],
+  ["Agent Policy", "src/agent_policy.rs", "User automation limits and x402 spend cap"],
+  ["Action Ledger", "src/action_ledger.rs", "AI action + verdict + x402 receipt on-chain"],
+  ["Vault Router", "src/vault_router.rs", "Active DeFi allocations by protocol and APY"]
+];
+
+const fade = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0 }
+};
+
+export default function LandingPage() {
   return (
-    <main className="scanline scan-grid relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,11,16,0.08),#080B10_94%)]" />
+    <main className="min-h-screen bg-sf-void text-sf-t1">
       <Nav />
-      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-96px)] max-w-7xl flex-col items-center justify-center px-4 pb-14 text-center md:px-8">
-        <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} className="w-full">
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-guard-border bg-guard-surface/80 px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-guard-cyan">
-            <Radar className="h-4 w-4" />
-            Devnet Verdict Registry
+
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-16 pt-8 md:px-8 lg:grid-cols-[55fr_45fr]">
+        <motion.div initial="hidden" animate="show" variants={fade} transition={{ duration: 0.45 }}>
+          <div className="font-code inline-flex rounded-md border border-[color:var(--border)] bg-sf-primary/10 px-3 py-2 text-xs uppercase tracking-[0.14em] text-sf-primary">
+            Live on Solana devnet · 4 Anchor programs
           </div>
-          <h1 className="mx-auto max-w-5xl font-mono text-4xl font-black uppercase leading-tight text-white md:text-7xl">
-            Know who you&apos;re dealing with.
+          <h1 className="font-display mt-8 max-w-4xl text-[44px] font-extrabold leading-[1.05] text-sf-t1 md:text-[56px]">
+            Your DeFi portfolio, protected by AI on every move.
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-guard-text md:text-xl">
-            AI risk verdicts for every Solana wallet. Stored permanently on-chain.
+          <p className="mt-6 max-w-[420px] text-base leading-[1.7] text-sf-t2">
+            SentinelFi is an autonomous agent that acts on your Solana portfolio within rules you set. Before every action, it runs a built-in security check — paying for risk intelligence via x402 and storing the verdict on-chain.
           </p>
-
-          <form onSubmit={submit} className="mx-auto mt-10 flex max-w-4xl flex-col gap-3 rounded-full border border-guard-border bg-guard-surface/90 p-3 shadow-cyan backdrop-blur md:flex-row">
-            <label className="sr-only" htmlFor="wallet-address">
-              Solana wallet address
-            </label>
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-guard-muted" />
-              <input
-                id="wallet-address"
-                value={address}
-                onChange={(event) => setAddress(event.target.value)}
-                placeholder="Enter Solana wallet address..."
-                className="h-16 w-full rounded-full border border-transparent bg-[#080B10] pl-14 pr-4 font-mono text-sm text-white outline-none transition placeholder:text-guard-muted focus:border-guard-cyan focus:shadow-[0_0_0_2px_#00E5FF,0_0_24px_rgba(0,229,255,0.15)] md:text-base"
-              />
-            </div>
-            <button className="h-16 rounded-full bg-guard-cyan px-8 font-mono text-sm font-bold uppercase tracking-[0.16em] text-[#031014] transition hover:shadow-[0_0_32px_rgba(0,229,255,0.55)]">
-              Analyze
-            </button>
-          </form>
-
-          <div className="mx-auto mt-5 flex max-w-3xl flex-wrap justify-center gap-3">
-            {stats.map(({ icon: Icon, label }) => (
-              <span key={label} className="inline-flex items-center gap-2 rounded-full border border-guard-border bg-guard-surface/70 px-4 py-2 font-mono text-xs uppercase tracking-[0.13em] text-guard-muted">
-                <Icon className="h-3.5 w-3.5 text-guard-cyan" />
-                {label}
-              </span>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/app"
+              className="font-code inline-flex h-12 items-center justify-center gap-2 rounded-md bg-sf-primary px-5 text-xs font-medium uppercase tracking-[0.14em] text-sf-void"
+            >
+              Launch Agent <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/app/scan"
+              className="font-code inline-flex h-12 items-center justify-center rounded-md border border-[color:var(--border)] px-5 text-xs font-medium uppercase tracking-[0.14em] text-sf-t1"
+            >
+              Scan a wallet
+            </Link>
+          </div>
+          <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
+            {stats.map(([value, label], index) => (
+              <motion.div
+                key={label}
+                variants={fade}
+                initial="hidden"
+                animate="show"
+                transition={{ delay: 0.08 * (index + 1) }}
+                className="card p-4"
+              >
+                <div className="font-display text-3xl font-extrabold text-sf-t1">{value}</div>
+                <div className="font-code mt-2 text-xs uppercase tracking-[0.12em] text-sf-t2">{label}</div>
+              </motion.div>
             ))}
           </div>
+        </motion.div>
 
-          <div className="mx-auto mt-10 max-w-3xl">
-            <div className="mb-4 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.2em] text-guard-muted">
-              <span className="h-px flex-1 bg-guard-border" />
-              Or try a demo
-              <span className="h-px flex-1 bg-guard-border" />
-            </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              {demoWallets.map((demo) => (
-                <button
-                  key={demo.label}
-                  onClick={() => run(demo.address)}
-                  className="inline-flex h-11 items-center gap-2 rounded-md border border-guard-border bg-guard-surface/80 px-4 font-mono text-xs uppercase tracking-[0.13em] text-guard-text transition hover:border-guard-cyan hover:text-guard-cyan"
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={fade}
+          transition={{ delay: 0.12, duration: 0.45 }}
+          className="card self-start"
+        >
+          <div className="flex items-center justify-between border-b border-[color:var(--border)] p-4">
+            <div className="font-code text-xs uppercase tracking-[0.14em] text-sf-t2">Live execution trace</div>
+            <div className="font-code rounded-full border border-sf-ok/25 bg-sf-ok/10 px-2.5 py-1 text-[10px] uppercase text-sf-ok">LIVE</div>
+          </div>
+          <div className="p-4">
+            <div className="space-y-3">
+              {traceRows.map((row, index) => (
+                <motion.div
+                  key={row.n}
+                  variants={fade}
+                  initial="hidden"
+                  animate="show"
+                  transition={{ delay: 0.08 * (index + 2) }}
+                  className="flex gap-3 rounded-md border border-[color:var(--border)] bg-sf-deep p-3"
                 >
-                  {demo.label} <ExternalLink className="h-3.5 w-3.5" />
-                </button>
+                  <div
+                    className="font-code grid h-8 w-8 shrink-0 place-items-center rounded-full border text-xs"
+                    style={{ borderColor: row.color, color: row.color }}
+                  >
+                    {row.n}
+                  </div>
+                  <div>
+                    <div className="font-display text-base font-bold text-sf-t1">{row.title}</div>
+                    <div className="mt-1 text-sm text-sf-t1">{row.body}</div>
+                    <div className="font-code mt-1 text-xs text-sf-t2">{row.meta}</div>
+                  </div>
+                </motion.div>
               ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 border-t border-[color:var(--border)] p-4 md:flex-row md:items-center md:justify-between">
+            <div className="font-code inline-flex items-center gap-2 rounded-md border border-sf-x402/25 bg-sf-x402/10 px-3 py-2 text-xs text-sf-x402">
+              <Zap className="h-4 w-4" />
+              x402 · 0.001 USDC paid
+            </div>
+            <div className="font-code text-xs text-sf-t2">
+              Htp9...JJpi — <span className="text-sf-danger">CRITICAL</span> · <span className="text-sf-danger">74</span>
             </div>
           </div>
         </motion.div>
       </section>
-      <AnimatePresence>{loadingAddress && <LoadingOverlay address={loadingAddress} />}</AnimatePresence>
+
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={fade}
+        className="mx-auto max-w-7xl px-4 py-12 md:px-8"
+      >
+        <div className="font-code text-xs uppercase tracking-[0.18em] text-sf-t2">Security loop</div>
+        <div className="mt-5 grid gap-4 md:grid-cols-4">
+          {loop.map(([n, title, copy, color], index) => (
+            <motion.div
+              key={title}
+              variants={fade}
+              transition={{ delay: 0.08 * index }}
+              className="card border-t-2 p-5"
+              style={{ borderTopColor: color }}
+            >
+              <div className="font-code text-xs" style={{ color }}>{n}</div>
+              <h2 className="font-display mt-4 text-2xl font-bold text-sf-t1">{title}</h2>
+              <p className="mt-3 text-sm leading-6 text-sf-t2">{copy}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={fade}
+        className="mx-auto max-w-7xl px-4 py-12 md:px-8"
+      >
+        <div className="font-code text-xs uppercase tracking-[0.18em] text-sf-t2">Contract surface</div>
+        <div className="mt-5 grid gap-4 md:grid-cols-4">
+          {contracts.map(([name, file, copy], index) => (
+            <motion.div key={name} variants={fade} transition={{ delay: 0.08 * index }} className="card p-5">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-sf-primary" />
+                <h2 className="font-display text-xl font-bold text-sf-t1">{name}</h2>
+              </div>
+              <div className="font-code mt-3 text-xs text-sf-t3">{file}</div>
+              <p className="mt-4 text-sm leading-6 text-sf-t2">{copy}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      <footer className="border-t border-[color:var(--border)]">
+        <div className="font-code mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-sf-t2 md:flex-row md:items-center md:justify-between md:px-8">
+          <div>SentinelFi · Autonomous DeFi security on Solana</div>
+          <div><span className="text-sf-warn">●</span> Solana devnet</div>
+        </div>
+      </footer>
     </main>
   );
 }

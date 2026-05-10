@@ -13,7 +13,7 @@ export async function analyzeWallet(
   });
 
   if (!response.ok) {
-    throw new Error(`WalletGuard analysis failed: ${response.statusText}`);
+    throw new Error(`Sentinel Guard analysis failed: ${response.statusText}`);
   }
 
   const payload = await response.json();

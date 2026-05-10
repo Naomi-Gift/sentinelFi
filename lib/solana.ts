@@ -136,6 +136,7 @@ export async function getWalletSignals(address: string): Promise<WalletSignals> 
     tokenAccountCount: tokenAccounts.value.length,
     nonZeroTokenAccountCount,
     flaggedInteractions,
+    directlyFlagged: flaggedSet.has(address),
     knownFlaggedAddressesChecked: KNOWN_FLAGGED_ADDRESSES.length,
     sampledTransactionCount: transactions.filter(Boolean).length,
     collectionWarnings
@@ -154,6 +155,7 @@ export function getDegradedWalletSignals(address: string, reason: string): Walle
     tokenAccountCount: 0,
     nonZeroTokenAccountCount: 0,
     flaggedInteractions: [],
+    directlyFlagged: KNOWN_FLAGGED_ADDRESSES.includes(address),
     knownFlaggedAddressesChecked: KNOWN_FLAGGED_ADDRESSES.length,
     sampledTransactionCount: 0,
     collectionWarnings: [

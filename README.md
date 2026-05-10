@@ -1,113 +1,82 @@
-# WalletGuard AI
+# SentinelFi
 
-> AI-powered wallet risk analysis for Solana. Plain-English verdicts. Stored on-chain.
+> Autonomous DeFi agent for Solana. Security built in. Every check paid via x402. Every verdict stored on-chain.
 
-## The Problem
+Dev3pack submission notes, demo script, and judging hooks are in [`SUBMISSION.md`](./SUBMISSION.md).
 
-Solana users have no easy way to know if a wallet is a scammer, a dead wallet, or safe to interact with. Existing tools return raw data. WalletGuard explains it.
+## What It Does
 
-## How It Works
+SentinelFi is an autonomous DeFi agent that monitors your Solana portfolio and acts within rules you define on-chain. Before every action — stake, swap, rebalance, or quarantine — it runs a built-in AI security check on the target wallet or contract, pays for that intelligence via x402, and stores the verdict on Solana.
 
-1. Fetch on-chain data: transactions, wallet age, token accounts, activity, flagged interactions.
-2. Claude AI analyzes the patterns and returns a plain-English risk verdict.
-3. Verdict can be stored on-chain via the Anchor Verdict Registry PDA.
-4. Wallets and apps can embed the analysis through the `walletguard-sdk` package.
+Security is not a separate product. It is the foundation every agent decision is built on.
 
-## On-Chain Program
-
-Network: Solana Devnet
-
-Program ID: `11111111111111111111111111111111`
-
-[View on Explorer](https://explorer.solana.com/address/11111111111111111111111111111111?cluster=devnet)
-
-Replace the placeholder ID after deploying `programs/walletguard` to devnet.
-
-## SDK Integration
-
-```bash
-npm install walletguard-sdk
+```text
+User asks SentinelFi to act
+  → Agent reads on-chain policy
+  → Agent pays 0.001 USDC via x402 for a fresh risk verdict
+  → AI scores the target: LOW / MEDIUM / HIGH / CRITICAL
+  → Verdict stored on-chain as a PDA
+  → Agent allows or blocks the action
+  → Action + verdict + payment receipt logged to Action Ledger
 ```
 
-```typescript
-import { analyzeWallet } from "walletguard-sdk";
+## On-Chain Programs — Solana Devnet
 
-const verdict = await analyzeWallet("WALLET_ADDRESS");
-// { score: 74, label: "HIGH", verdict: "...", reasons: [...] }
-```
+| Program | ID | Purpose |
+|---|---|---|
+| Verdict Registry | `YOUR_PROGRAM_ID_1` | Stores AI risk score + verdict per wallet as a PDA |
+| Agent Policy | `YOUR_PROGRAM_ID_2` | User automation rules and x402 spend limits |
+| Action Ledger | `YOUR_PROGRAM_ID_3` | Immutable log of every action + verdict + x402 receipt |
+| Vault Router | `YOUR_PROGRAM_ID_4` | Active DeFi allocations by protocol and APY |
 
-## Architecture
+## Routes
 
-```mermaid
-flowchart LR
-  User["User / Wallet Company"] --> Web["Next.js App"]
-  Web --> API["/api/analyze"]
-  SDK["walletguard-sdk"] --> API
-  API --> Helius["Helius / Solana RPC"]
-  API --> Claude["Claude Sonnet 4"]
-  API --> Anchor["Anchor Verdict Registry"]
-  Anchor --> PDA["Verdict PDA"]
-  API --> Result["Plain-English Verdict JSON"]
-```
+| Route | Purpose |
+|---|---|
+| `/` | Landing page |
+| `/app` | Main agent dashboard |
+| `/app/chat` | Natural language agent commands |
+| `/app/history` | On-chain action log |
+| `/app/policy` | Agent policy configuration |
+| `/app/scan` | Security scanner utility |
+| `/docs` | Product documentation |
+
+## API Reference
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/agent` | Run agent — triggers security check internally before every action |
+| `POST` | `/api/analyze` | Run security check |
+| `POST` | `/api/watch` | Watch a wallet and emit risk-change events |
+| `POST` | `/api/x402/pay` | Autonomous payment handler |
 
 ## Local Setup
 
 ```bash
-git clone https://github.com/YOUR/walletguard
-cd walletguard
 npm install
 cp .env.example .env.local
 npm run dev
 ```
 
-Set the relevant keys in `.env.local`:
+## Deploy Contracts
 
-```env
-HELIUS_RPC_URL=https://devnet.helius-rpc.com/?api-key=YOUR_KEY
-ANTHROPIC_API_KEY=sk-ant-YOUR_KEY
-NEXT_PUBLIC_PROGRAM_ID=YOUR_ANCHOR_PROGRAM_ID
-NEXT_PUBLIC_SOLANA_NETWORK=devnet
+```bash
+solana config set --url devnet
+solana airdrop 2
+anchor build
+anchor deploy --provider.cluster devnet
 ```
 
-Without `ANTHROPIC_API_KEY`, the app uses a deterministic local risk heuristic. Without a Helius key, it falls back to public devnet RPC and returns a provisional verdict if RPC is throttled.
-
-## Pages
-
-- `/` - Search-first homepage with demo wallets
-- `/analyze/[address]` - Cinematic wallet verdict card
-- `/bulk` - Bulk analyzer for up to 20 wallets
-- `/watch` - Polling wallet watcher with live event log
-
-## API
-
-`POST /api/analyze`
-
-```json
-{
-  "address": "WALLET_ADDRESS",
-  "storeOnChain": true
-}
-```
-
-`POST /api/watch`
-
-```json
-{
-  "address": "WALLET_ADDRESS",
-  "lastScore": 45
-}
-```
-
-## Anchor
-
-The Anchor program stores one PDA per analyzed wallet:
+## Contract Source
 
 ```text
-seeds = ["verdict", analyzed_wallet]
+programs/walletguard/src/
+├── lib.rs
+├── agent_policy.rs
+├── action_ledger.rs
+└── vault_router.rs
 ```
 
-The record stores wallet pubkey, score, label, timestamp, and bump.
+## License
 
-## Built With
-
-Next.js · TypeScript · Tailwind CSS · Framer Motion · Solana web3.js · Anchor · Claude AI · Helius RPC
+MIT

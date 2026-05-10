@@ -11,6 +11,7 @@ export type WalletSignals = {
   tokenAccountCount: number;
   nonZeroTokenAccountCount: number;
   flaggedInteractions: string[];
+  directlyFlagged?: boolean;
   knownFlaggedAddressesChecked: number;
   sampledTransactionCount: number;
   collectionWarnings: string[];
