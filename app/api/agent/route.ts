@@ -42,11 +42,11 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as {
       userMessage?: string;
       portfolio?: { positions?: AgentPosition[] };
-      policy?: { walletguardCheck?: boolean; maxX402UsdcPerAction?: number; autoExecute?: boolean };
+      policy?: { securityCheck?: boolean; maxX402UsdcPerAction?: number; autoExecute?: boolean };
     };
 
     const positions = body.portfolio?.positions?.length ? body.portfolio.positions : defaultPositions;
-    const securityCheckEnabled = body.policy?.walletguardCheck ?? true;
+    const securityCheckEnabled = body.policy?.securityCheck ?? true;
     const maxX402Usdc = body.policy?.maxX402UsdcPerAction ?? 0.001;
     const checkedWallets: AgentResponse["checkedWallets"] = [];
 
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
             targetWallet: blocked.address,
             requiresApproval: false,
             withinPolicy: true,
-            walletguardVerdict: {
+            securityVerdict: {
               score: blocked.verdict.score,
               label: blocked.verdict.label,
               blocked: true,
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
             targetWallet: clean?.address ?? null,
             requiresApproval: true,
             withinPolicy: true,
-            walletguardVerdict: clean
+            securityVerdict: clean
               ? {
                   score: clean.verdict.score,
                   label: clean.verdict.label,
@@ -113,9 +113,9 @@ export async function POST(request: Request) {
         ? {
             id: `ledger-${Date.now()}`,
             actionType: action.type,
-            walletguardScore: action.walletguardVerdict?.score ?? 0,
-            walletguardLabel: action.walletguardVerdict?.label ?? "LOW",
-            walletguardVerdictPda: action.walletguardVerdict?.verdictPDA,
+            securityScore: action.securityVerdict?.score ?? 0,
+            securityLabel: action.securityVerdict?.label ?? "LOW",
+            securityVerdictPda: action.securityVerdict?.verdictPDA,
             x402PaymentSig: checkedWallets[0].receipt.txSignature,
             timestamp: new Date().toISOString()
           }

@@ -7,22 +7,22 @@
 :root {
   color-scheme: dark;
   --void: #020407;
-  --deep: #050c17;
-  --surface: #080f1e;
-  --raised: #0a1628;
-  --border: rgba(0, 180, 255, 0.08);
-  --border-hot: rgba(0, 180, 255, 0.25);
-  --primary: #00b4ff;
-  --security: #00e5cc;
-  --secondary: #00e5cc;
-  --x402: #a855f7;
-  --ok: #00e676;
-  --warn: #ffd600;
-  --danger: #ff4a4a;
-  --critical: #ff1744;
-  --t1: #ebf4ff;
-  --t2: #6b9ab8;
-  --t3: #2a4158;
+  --deep: #060b12;
+  --surface: #0a111c;
+  --raised: #101a28;
+  --border: rgba(148, 163, 184, 0.13);
+  --border-hot: rgba(100, 210, 255, 0.36);
+  --primary: #64d2ff;
+  --security: #4dd6be;
+  --secondary: #4dd6be;
+  --x402: #c084fc;
+  --ok: #5ee987;
+  --warn: #f4c95d;
+  --danger: #ff6b6b;
+  --critical: #ff3b5f;
+  --t1: #f4f8fb;
+  --t2: #9aa8b8;
+  --t3: #596778;
   background: var(--void);
 }
 
@@ -37,7 +37,9 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--void);
+  background:
+    radial-gradient(circle at 50% -10%, rgba(100, 210, 255, 0.09), transparent 34rem),
+    linear-gradient(180deg, #020407 0%, #05080d 42%, #020407 100%);
   color: var(--t1);
   font-family: "Outfit", sans-serif;
 }
@@ -61,15 +63,17 @@ textarea {
 }
 
 .card {
-  border: 0.5px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(10, 17, 28, 0.82);
+  backdrop-filter: blur(18px);
 }
 
 .card-raised {
-  border: 0.5px solid var(--border);
-  border-radius: 8px;
-  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(16, 26, 40, 0.86);
+  backdrop-filter: blur(18px);
 }
 
 .focus-guard:focus {
@@ -93,4 +97,24 @@ textarea {
 .terminal-scrollbar::-webkit-scrollbar-thumb {
   background: var(--t3);
   border-radius: 999px;
+}
+
+.page-shell {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hairline {
+  border-color: var(--border);
+}
+
+.metric-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
 }

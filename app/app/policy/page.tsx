@@ -22,7 +22,7 @@ export default function PolicyPage() {
       <Nav />
       <section className="mx-auto max-w-[640px] px-4 pb-14 pt-8 md:px-8">
         <h1 className="font-display text-2xl font-bold text-sf-t1">Agent policy</h1>
-        <p className="mt-3 text-sm leading-7 text-sf-t2">Rules stored on Solana. Agent reads them before every action.</p>
+        <p className="mt-3 text-sm leading-7 text-sf-t2">Your policy controls when SentinelFi can recommend, pause, or ask for approval.</p>
         <div className="mt-6 space-y-4">
           <Row title="Auto-execution limit" sub="Max SOL agent moves without your approval" value="1.0 SOL" />
           <Row title="Exit LP at impermanent loss" sub="Agent auto-exits liquidity positions at this threshold" value="70%" accent="var(--warn)" />
@@ -33,7 +33,7 @@ export default function PolicyPage() {
         <button onClick={() => setSaved(true)} className="mt-5 w-full rounded-md bg-sf-primary px-5 py-3 text-sm font-medium text-sf-void">
           {saved ? "✓ Policy saved on-chain" : "Save policy to Solana"}
         </button>
-        <div className="font-code mt-3 text-[10px] text-sf-t3">{saved ? "PDA: 8xKp...3mNw · Solana devnet ↗" : "PDA will be derived from connected wallet · Solana devnet"}</div>
+        <div className="font-code mt-3 text-[10px] text-sf-t3">{saved ? "Policy saved for connected wallet" : "Policy will be tied to your connected wallet"}</div>
       </section>
     </main>
   );

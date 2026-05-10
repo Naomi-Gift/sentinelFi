@@ -42,7 +42,7 @@ export function watchWallet(
           });
         }
       } catch (error) {
-        console.error("Sentinel Guard watch error:", error);
+        console.error("SentinelFi watch error:", error);
       }
 
       await new Promise((resolve) => setTimeout(resolve, interval));

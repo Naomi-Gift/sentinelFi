@@ -17,7 +17,7 @@ export type AgentAction = {
   targetWallet: string | null;
   requiresApproval: boolean;
   withinPolicy: boolean;
-  walletguardVerdict: {
+  securityVerdict: {
     score: number;
     label: RiskLabel;
     blocked: boolean;
@@ -41,9 +41,9 @@ export type AgentResponse = {
   actionLedger: {
     id: string;
     actionType: AgentAction["type"];
-    walletguardScore: number;
-    walletguardLabel: RiskLabel;
-    walletguardVerdictPda?: string;
+    securityScore: number;
+    securityLabel: RiskLabel;
+    securityVerdictPda?: string;
     x402PaymentSig: string;
     timestamp: string;
   } | null;

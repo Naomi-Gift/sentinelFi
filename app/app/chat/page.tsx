@@ -17,7 +17,7 @@ export default function ChatPage() {
           <div className="mt-1 text-sm text-sf-ok">▲ +3 today</div>
           <div className="mt-5 space-y-3">
             <div className="card p-3"><div className="font-display text-lg font-bold text-sf-x402">0.047 USDC</div><div className="text-[11px] text-sf-t3">x402 spent today · 47 checks</div></div>
-            <div className="card p-3"><div className="font-display text-lg font-bold text-sf-t1">4</div><div className="text-[11px] text-sf-t3">Anchor programs on-chain</div></div>
+            <div className="card p-3"><div className="font-display text-lg font-bold text-sf-t1">4</div><div className="text-[11px] text-sf-t3">security modules active</div></div>
           </div>
           <div className="font-code mt-6 text-[11px] uppercase tracking-[0.12em] text-sf-t3">Recent commands</div>
           <div className="mt-3 space-y-2 font-code text-[11px] text-sf-t3">
@@ -52,7 +52,7 @@ export default function ChatPage() {
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="flex max-w-2xl gap-3">
               <div className="grid h-7 w-7 shrink-0 place-items-center bg-sf-primary text-xs text-sf-void [clip-path:polygon(25%_0,75%_0,100%_50%,75%_100%,25%_100%,0_50%)]">A</div>
               <div>
-                <div className="font-code text-[10px] text-sf-ok">✓ Transaction confirmed · Solana devnet</div>
+                <div className="font-code text-[10px] text-sf-ok">✓ Transaction confirmed</div>
                 <p className="mt-2 text-xs text-sf-t2">Staked 2 SOL · Marinade · 7.4% APY</p>
                 <div className="font-code mt-3 flex gap-4 text-[11px] text-sf-primary"><a>View transaction ↗</a><a>View action ledger ↗</a></div>
               </div>

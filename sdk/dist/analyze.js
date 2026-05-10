@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyzeWallet = analyzeWallet;
-const API_BASE = process.env.WALLETGUARD_API_URL || "https://walletguard.ai/api";
+const API_BASE = process.env.SENTINELFI_API_URL || "https://sentinelfi.app/api";
 async function analyzeWallet(address, options) {
     const response = await fetch(`${options?.apiBase ?? API_BASE}/analyze`, {
         method: "POST",
@@ -9,7 +9,7 @@ async function analyzeWallet(address, options) {
         body: JSON.stringify({ address, storeOnChain: options?.storeOnChain ?? true })
     });
     if (!response.ok) {
-        throw new Error(`Sentinel Guard analysis failed: ${response.statusText}`);
+        throw new Error(`SentinelFi security check failed: ${response.statusText}`);
     }
     const payload = await response.json();
     return {

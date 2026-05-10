@@ -1,6 +1,6 @@
 import { WalletVerdict } from "./types";
 
-const API_BASE = process.env.WALLETGUARD_API_URL || "https://walletguard.ai/api";
+const API_BASE = process.env.SENTINELFI_API_URL || "https://sentinelfi.app/api";
 
 export async function analyzeWallet(
   address: string,
@@ -13,7 +13,7 @@ export async function analyzeWallet(
   });
 
   if (!response.ok) {
-    throw new Error(`Sentinel Guard analysis failed: ${response.statusText}`);
+    throw new Error(`SentinelFi security check failed: ${response.statusText}`);
   }
 
   const payload = await response.json();

@@ -20,7 +20,7 @@ export async function recordLookupAudit(
   verdict: WalletVerdict
 ): Promise<AuditTrail> {
   if (!process.env.ANCHOR_AUDIT_PROGRAM_ID || !process.env.ANCHOR_AUDIT_KEYPAIR_JSON) {
-    const configuredProgram = process.env.NEXT_PUBLIC_PROGRAM_ID;
+    const configuredProgram = process.env.NEXT_PUBLIC_VERDICT_REGISTRY_ID;
     const derivedPda = configuredProgram
       ? PublicKey.findProgramAddressSync(
           [Buffer.from("verdict"), new PublicKey(walletAddress).toBuffer()],
@@ -55,7 +55,7 @@ export async function recordLookupAudit(
     const idl = {
       address: programId.toBase58(),
       metadata: {
-        name: "walletguard",
+        name: "verdict_registry",
         version: "0.1.0",
         spec: "0.1.0"
       },
@@ -71,7 +71,8 @@ export async function recordLookupAudit(
           ],
           args: [
             { name: "risk_score", type: "u8" },
-            { name: "risk_label", type: "u8" }
+            { name: "risk_label", type: "u8" },
+            { name: "x402_payment_sig", type: { array: ["u8", 64] } }
           ]
         }
       ]
@@ -79,8 +80,9 @@ export async function recordLookupAudit(
 
     const program = new anchor.Program(idl as Idl, provider);
     const labelCode = { LOW: 0, MEDIUM: 1, HIGH: 2, CRITICAL: 3 }[verdict.label];
+    const paymentSig = Array.from(new Uint8Array(64));
     const signature = await (program.methods as any)
-      .storeVerdict(verdict.score, labelCode)
+      .storeVerdict(verdict.score, labelCode, paymentSig)
       .accounts({
         verdictRecord,
         analyzedWallet,

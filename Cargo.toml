@@ -1,6 +1,9 @@
 [workspace]
 members = [
-    "programs/walletguard"
+    "programs/sentinelfi/verdict_registry",
+    "programs/sentinelfi/agent_policy",
+    "programs/sentinelfi/action_ledger",
+    "programs/sentinelfi/vault_router"
 ]
 resolver = "2"
 

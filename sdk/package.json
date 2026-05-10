@@ -1,14 +1,14 @@
 {
-  "name": "walletguard-sdk",
+  "name": "sentinelfi-sdk",
   "version": "0.1.0",
-  "description": "AI-powered Solana wallet risk analysis SDK",
+  "description": "Autonomous Solana DeFi agent SDK with built-in security checks",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"
   },
-  "keywords": ["solana", "wallet", "security", "AI", "risk"],
+  "keywords": ["solana", "defi", "agent", "security", "x402", "risk"],
   "dependencies": {
     "@solana/web3.js": "^1.95.8"
   },

@@ -1,45 +1,48 @@
 "use client";
 
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
+import { WalletLaunchButton } from "@/components/wallet-connect";
 
 export function Nav() {
   return (
-    <header className="relative z-20 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 md:px-8">
-      <Link href="/" className="font-display flex items-center gap-2 text-xl font-extrabold tracking-[0.02em] text-sf-t1">
-        <span className="h-2 w-2 rounded-full bg-sf-primary" />
-        <span>◈</span>
-        SentinelFi
+    <header className="sticky top-0 z-30 border-b border-[color:var(--border)] bg-sf-void/82 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-8">
+      <Link href="/" className="font-display flex items-center gap-3 text-lg font-extrabold text-sf-t1">
+        <span className="grid h-8 w-8 place-items-center rounded-lg border border-sf-primary/30 bg-sf-primary/10 text-sm text-sf-primary">
+          S
+        </span>
+        <span>SentinelFi</span>
       </Link>
 
-      <nav className="font-code hidden items-center gap-5 text-xs uppercase tracking-[0.12em] text-sf-t2 md:flex">
-        <Link className="transition hover:text-sf-primary" href="/app">
-          App
+      <nav className="font-code hidden items-center gap-1 rounded-full border border-[color:var(--border)] bg-sf-surface/70 p-1 text-[11px] uppercase tracking-[0.08em] text-sf-t2 md:flex">
+        <Link className="transition hover:text-sf-primary" href="/">
+          <span className="block rounded-full px-3 py-1.5">Home</span>
         </Link>
-        <Link className="transition hover:text-sf-primary" href="/app/chat">
-          Chat
+        <Link className="transition hover:text-sf-primary" href="/app">
+          <span className="block rounded-full px-3 py-1.5">App</span>
         </Link>
         <Link className="transition hover:text-sf-primary" href="/app/history">
-          History
+          <span className="block rounded-full px-3 py-1.5">History</span>
         </Link>
         <Link className="transition hover:text-sf-primary" href="/app/policy">
-          Policy
-        </Link>
-        <Link className="transition hover:text-sf-primary" href="/app/scan">
-          Scan
+          <span className="block rounded-full px-3 py-1.5">Policy</span>
         </Link>
         <Link className="transition hover:text-sf-primary" href="/docs">
-          Docs
+          <span className="block rounded-full px-3 py-1.5">Docs</span>
         </Link>
       </nav>
 
-      <div className="font-code hidden items-center gap-3 text-xs uppercase tracking-[0.12em] md:flex">
-        <span className="rounded-full border border-sf-ok/25 bg-sf-ok/10 px-3 py-1.5 text-sf-ok">
-          ● Agent active
+      <div className="font-code hidden items-center gap-2 text-[11px] uppercase tracking-[0.08em] md:flex">
+        <span className="inline-flex items-center gap-2 rounded-full border border-sf-ok/25 bg-sf-ok/10 px-3 py-1.5 text-sf-ok">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Protected
         </span>
-        <span className="text-sf-t2">devnet</span>
-        <Link href="/app" className="rounded-md border border-sf-primary/40 px-3 py-1.5 text-sf-primary">
-          Launch App
-        </Link>
+        <WalletLaunchButton
+          compact
+          className="inline-flex items-center gap-1.5 rounded-full border border-sf-primary/35 px-3 py-1.5 text-sf-primary transition hover:bg-sf-primary hover:text-sf-void disabled:opacity-60"
+        />
+      </div>
       </div>
     </header>
   );

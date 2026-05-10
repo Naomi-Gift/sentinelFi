@@ -3,10 +3,16 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-walletguard = "B5zhRju3oDVLXtX72Tpi8DDTWceDetQqC14eMEheqLQ9"
+verdict_registry = "B5zhRju3oDVLXtX72Tpi8DDTWceDetQqC14eMEheqLQ9"
+agent_policy = "8hsKs8eBYwUqGmim6PcstpS75YFWpinGugrBv7gdvD1T"
+action_ledger = "AnGfz5kMTCqxnKtEciDc6QUqZvaHhqh1nyAjd8GcrMGH"
+vault_router = "213i6h266zzchmxs5wKFcAfwkwAy9dgYQhGg8EZTE66r"
 
 [programs.localnet]
-walletguard = "B5zhRju3oDVLXtX72Tpi8DDTWceDetQqC14eMEheqLQ9"
+verdict_registry = "B5zhRju3oDVLXtX72Tpi8DDTWceDetQqC14eMEheqLQ9"
+agent_policy = "8hsKs8eBYwUqGmim6PcstpS75YFWpinGugrBv7gdvD1T"
+action_ledger = "AnGfz5kMTCqxnKtEciDc6QUqZvaHhqh1nyAjd8GcrMGH"
+vault_router = "213i6h266zzchmxs5wKFcAfwkwAy9dgYQhGg8EZTE66r"
 
 [registry]
 url = "https://api.apr.dev"
